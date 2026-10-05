@@ -1,6 +1,6 @@
 cask "eyelid" do
-  version "0.2.0"
-  sha256 "6c80e3da27e202eed229591a352eb186884cdc7287a785fdd841a6bff9c05007"
+  version "0.3.0"
+  sha256 "51b700d00e318c697cce12182bbc387f42cba43a4ee53d49e3120603d80b105f"
 
   url "https://github.com/Nikita19329/Eyelid/releases/download/v#{version}/Eyelid-#{version}.zip"
   name "Eyelid"
