@@ -2,10 +2,10 @@ cask "eyelid" do
   version "0.5.0"
   sha256 "5fd40a99fa710b501a13487264d92bd8576861ce86e43601f462a127799d7424"
 
-  url "https://github.com/Nikita19329/Eyelid/releases/download/v#{version}/Eyelid-#{version}.zip"
+  url "https://github.com/Satis-ku/Eyelid/releases/download/v#{version}/Eyelid-#{version}.zip"
   name "Eyelid"
   desc "Dynamic Island-style notch for MacBooks"
-  homepage "https://github.com/Nikita19329/Eyelid"
+  homepage "https://github.com/Satis-ku/Eyelid"
 
   livecheck do
     url :url

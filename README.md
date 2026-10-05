@@ -1,20 +1,21 @@
-# Nikita19329's Homebrew tap
+# Satis-ku's Homebrew tap
 
-[![Test](https://github.com/Nikita19329/homebrew-tap/actions/workflows/test.yml/badge.svg)](https://github.com/Nikita19329/homebrew-tap/actions/workflows/test.yml)
+[![Test](https://github.com/Satis-ku/homebrew-tap/actions/workflows/test.yml/badge.svg)](https://github.com/Satis-ku/homebrew-tap/actions/workflows/test.yml)
 
 Homebrew casks for my apps.
 
 | Cask | App |
 |---|---|
-| `eyelid` | [Eyelid](https://github.com/Nikita19329/Eyelid), an open-source, Dynamic Island–style notch for MacBooks |
+| `eyelid` | [Eyelid](https://github.com/Satis-ku/Eyelid), an open-source, Dynamic Island–style notch for MacBooks |
 
 ## Eyelid
 
 ```sh
-brew install --cask nikita19329/tap/eyelid
+brew install --cask satis-ku/tap/eyelid
 ```
 
 - **Update:** `brew upgrade --cask eyelid`
+- **Tapped before the move to Satis-ku?** The old `nikita19329/tap` works while GitHub redirects it. To switch for good, without losing your settings: `brew uninstall --cask eyelid && brew untap nikita19329/tap && brew install --cask satis-ku/tap/eyelid`
 - **Uninstall:** `brew uninstall --cask eyelid`, or add `--zap` to also remove its settings and the files it saved for the shelf.
 
 Eyelid isn't notarized by Apple, so macOS blocks its first launch. Allow it in **System Settings → Privacy & Security** with **Open Anyway**.

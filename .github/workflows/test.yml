@@ -26,21 +26,21 @@ jobs:
           persist-credentials: false
 
       - name: Tap this checkout
-        run: brew tap nikita19329/tap "$GITHUB_WORKSPACE"
+        run: brew tap satis-ku/tap "$GITHUB_WORKSPACE"
 
       - name: Style and audit
         env:
           # Without a token, brew's GitHub API calls share the runner's tiny anonymous rate limit.
           HOMEBREW_GITHUB_API_TOKEN: ${{ github.token }}
         run: |
-          brew style nikita19329/tap
-          brew audit --cask --strict --online nikita19329/tap/eyelid
+          brew style satis-ku/tap
+          brew audit --cask --strict --online satis-ku/tap/eyelid
 
       - name: Install and uninstall
         env:
           HOMEBREW_GITHUB_API_TOKEN: ${{ github.token }}
         run: |
-          brew install --cask nikita19329/tap/eyelid
+          brew install --cask satis-ku/tap/eyelid
           expected="$(sed -nE 's/^  version "([^"]+)"$/\1/p' Casks/eyelid.rb)"
           installed="$(plutil -extract CFBundleShortVersionString raw /Applications/Eyelid.app/Contents/Info.plist)"
           if [[ "$installed" != "$expected" ]]; then
