@@ -16,11 +16,11 @@ cask "eyelid" do
 
   app "Eyelid.app"
 
-  uninstall quit: "io.github.nikita19329.eyelid"
+  uninstall quit: "io.github.satis-ku.eyelid"
 
   zap trash: [
-    "~/Library/Application Support/io.github.nikita19329.eyelid",
-    "~/Library/Preferences/io.github.nikita19329.eyelid.plist",
+    "~/Library/Application Support/io.github.satis-ku.eyelid",
+    "~/Library/Preferences/io.github.satis-ku.eyelid.plist",
   ]
 
   caveats <<~EOS
