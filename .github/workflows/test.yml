@@ -1,0 +1,49 @@
+name: Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  test:
+    name: Audit, install and uninstall
+    runs-on: macos-26
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Tap this checkout
+        run: brew tap nikita19329/tap "$GITHUB_WORKSPACE"
+
+      - name: Style and audit
+        run: |
+          brew style nikita19329/tap
+          brew audit --cask --strict --online nikita19329/tap/eyelid
+
+      - name: Install and uninstall
+        run: |
+          brew install --cask nikita19329/tap/eyelid
+          expected="$(sed -nE 's/^  version "([^"]+)"$/\1/p' Casks/eyelid.rb)"
+          installed="$(plutil -extract CFBundleShortVersionString raw /Applications/Eyelid.app/Contents/Info.plist)"
+          if [[ "$installed" != "$expected" ]]; then
+            echo "::error::The cask installed Eyelid $installed instead of $expected"
+            exit 1
+          fi
+          brew uninstall --cask --zap eyelid
+          if [[ -e /Applications/Eyelid.app ]]; then
+            echo "::error::Eyelid.app is still in /Applications after uninstalling"
+            exit 1
+          fi

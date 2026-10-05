@@ -1,0 +1,105 @@
+name: Update Eyelid
+
+# Points the cask to Eyelid's latest release. It runs once a day, and can be started by hand right after a
+# release. Only zips that Eyelid's Release workflow built and attested get into the cask.
+on:
+  schedule:
+    - cron: "23 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: update-eyelid
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  check:
+    name: Check for a new release
+    # Most days there is nothing to do, so the check runs on Linux and only an update needs a Mac.
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      version: ${{ steps.release.outputs.version }}
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Compare the cask with the latest release
+        id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="$(gh release view --repo Nikita19329/Eyelid --json tagName --jq .tagName)"
+          version="${tag#v}"
+          if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::The latest release has an unexpected tag: $tag"
+            exit 1
+          fi
+          current="$(sed -nE 's/^  version "([^"]+)"$/\1/p' Casks/eyelid.rb)"
+          if [[ "$version" == "$current" ]]; then
+            echo "The cask already installs Eyelid $current."
+            exit 0
+          fi
+          echo "Eyelid $version is out, the cask still installs $current."
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+  update:
+    name: Update the cask
+    needs: check
+    if: needs.check.outputs.version != ''
+    runs-on: macos-26
+    timeout-minutes: 20
+    permissions:
+      contents: write # push the updated cask
+    env:
+      VERSION: ${{ needs.check.outputs.version }}
+      GH_TOKEN: ${{ github.token }}
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        # Keeps the token in the git config, which the last step needs to push.
+
+      - name: Download and verify the release
+        run: |
+          gh release download "v$VERSION" --repo Nikita19329/Eyelid --dir release \
+            --pattern "Eyelid-$VERSION.zip" --pattern "Eyelid-$VERSION.zip.sha256"
+          (cd release && shasum -a 256 -c "Eyelid-$VERSION.zip.sha256")
+          gh attestation verify "release/Eyelid-$VERSION.zip" --repo Nikita19329/Eyelid \
+            --signer-workflow Nikita19329/Eyelid/.github/workflows/release.yml
+
+      - name: Update and commit the cask
+        run: |
+          sha256="$(cut -d ' ' -f 1 "release/Eyelid-$VERSION.zip.sha256")"
+          sed -i '' -E \
+            -e "s/^  version \"[^\"]+\"$/  version \"$VERSION\"/" \
+            -e "s/^  sha256 \"[0-9a-f]+\"$/  sha256 \"$sha256\"/" \
+            Casks/eyelid.rb
+          git diff
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit --all --message "feat: update Eyelid to $VERSION"
+
+      # brew taps the commit, so the cask is tested exactly as it will be pushed.
+      - name: Test the cask
+        run: |
+          brew tap nikita19329/tap "$GITHUB_WORKSPACE"
+          brew audit --cask --strict --online nikita19329/tap/eyelid
+          brew install --cask nikita19329/tap/eyelid
+          installed="$(plutil -extract CFBundleShortVersionString raw /Applications/Eyelid.app/Contents/Info.plist)"
+          if [[ "$installed" != "$VERSION" ]]; then
+            echo "::error::The cask installed Eyelid $installed instead of $VERSION"
+            exit 1
+          fi
+          brew uninstall --cask --zap eyelid
+
+      - name: Push
+        run: git push origin HEAD:main
