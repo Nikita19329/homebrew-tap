@@ -59,6 +59,7 @@ jobs:
     timeout-minutes: 20
     permissions:
       contents: write # push the updated cask
+      actions: write # start the tests on the new commit
     env:
       VERSION: ${{ needs.check.outputs.version }}
       GH_TOKEN: ${{ github.token }}
@@ -106,3 +107,8 @@ jobs:
 
       - name: Push
         run: git push origin HEAD:main
+
+      # A push with the workflow's token starts no workflows, so the Test badge would keep the result from before the
+      # update, which fails livecheck once a release is out. Starting the tests by hand is allowed.
+      - name: Test main
+        run: gh workflow run test.yml --repo "$GITHUB_REPOSITORY" --ref main
