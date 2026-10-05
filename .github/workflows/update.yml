@@ -90,6 +90,9 @@ jobs:
 
       # brew taps the commit, so the cask is tested exactly as it will be pushed.
       - name: Test the cask
+        env:
+          # Without a token, brew's GitHub API calls share the runner's tiny anonymous rate limit.
+          HOMEBREW_GITHUB_API_TOKEN: ${{ github.token }}
         run: |
           brew tap nikita19329/tap "$GITHUB_WORKSPACE"
           brew audit --cask --strict --online nikita19329/tap/eyelid

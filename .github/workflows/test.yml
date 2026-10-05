@@ -29,11 +29,16 @@ jobs:
         run: brew tap nikita19329/tap "$GITHUB_WORKSPACE"
 
       - name: Style and audit
+        env:
+          # Without a token, brew's GitHub API calls share the runner's tiny anonymous rate limit.
+          HOMEBREW_GITHUB_API_TOKEN: ${{ github.token }}
         run: |
           brew style nikita19329/tap
           brew audit --cask --strict --online nikita19329/tap/eyelid
 
       - name: Install and uninstall
+        env:
+          HOMEBREW_GITHUB_API_TOKEN: ${{ github.token }}
         run: |
           brew install --cask nikita19329/tap/eyelid
           expected="$(sed -nE 's/^  version "([^"]+)"$/\1/p' Casks/eyelid.rb)"
