@@ -15,7 +15,7 @@ brew install --cask nikita19329/tap/eyelid
 ```
 
 - **Update:** `brew upgrade --cask eyelid`
-- **Uninstall:** `brew uninstall --cask eyelid`, or add `--zap` to remove its settings too.
+- **Uninstall:** `brew uninstall --cask eyelid`, or add `--zap` to also remove its settings and the files it saved for the shelf.
 
 Eyelid isn't notarized by Apple, so macOS blocks its first launch. Allow it in **System Settings → Privacy & Security** with **Open Anyway**.
 

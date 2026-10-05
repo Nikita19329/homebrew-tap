@@ -18,7 +18,10 @@ cask "eyelid" do
 
   uninstall quit: "io.github.nikita19329.eyelid"
 
-  zap trash: "~/Library/Preferences/io.github.nikita19329.eyelid.plist"
+  zap trash: [
+    "~/Library/Application Support/io.github.nikita19329.eyelid",
+    "~/Library/Preferences/io.github.nikita19329.eyelid.plist",
+  ]
 
   caveats <<~EOS
     Eyelid isn't notarized by Apple, so macOS blocks its first launch.
